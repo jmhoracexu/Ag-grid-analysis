@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { AgGridAngular } from 'ag-grid-angular';
 
 
-import { ColDef } from 'ag-grid-community';
+import { ColDef, GridOptions } from 'ag-grid-community';
 
 
 @Component({
@@ -29,10 +29,26 @@ export class AppComponent implements OnInit{
     })
   }
 
+  // gridOptions: GridOptions = {
+  //   defaultColDef: {
+  //     filter: 'agTextColumnFilter'
+  //   }
+  // }
+
   colDefs: ColDef[] = [
-    { field: "_id" },
-    { field: "name" },
-    { field: "timezone" },
-    { field: "currency" }
+    
+    { field: "_id", headerName:'ID'},
+    { field: "name", headerName:'Name',
+      cellRenderer:(item:any) =>{
+      return item.value + '#' + item.data._id.slice(-4).toUpperCase()
+    }},
+    { field: "timezone", headerName:'Timezone'},
+    { field: "currency", headerName:'Currency'}
   ]
+
+  defaultColDef = {
+    flex:1,
+    minWidth:100,
+    filter:'agTextColumnFilter'
+  }
 }
