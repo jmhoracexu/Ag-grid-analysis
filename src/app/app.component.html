@@ -4,18 +4,27 @@
           Export to CSV
   </button>
 </div>
-
 <div class="row">
   <div class="col-12">
-    <ag-grid-angular style="height: 500px;width: 100%;"
+    <ag-grid-angular style="height:250px;width: 100%;"
     class="ag-theme-quartz"
     [rowData]="accountList"
     [columnDefs]="colDefs"
     [defaultColDef]="defaultColDef"
     (gridReady)="onGridReady($event)"
     [rowSelection]="rowSelection"
-    [pagination]="true"
-    [paginationPageSizeSelector]='[5, 10, 20, 50, 100]'>
+    (rowClicked)="onRowClicked($event)">
+    </ag-grid-angular>
+  </div>
+  <div class="col-12" *ngIf="selectedAccountID && selectedAccountDetails">
+    <ag-grid-angular style="height: 500px;width: 100%;"
+                     class="ag-theme-quartz"
+                     [rowData]="selectedAccountDetails"
+                     [columnDefs]="additionalColDefs"
+                     [defaultColDef]="defaultColDef"
+                     [pagination]="true"
+                     [paginationPageSizeSelector]='[5, 10, 20, 50, 100]'>
+
     </ag-grid-angular>
   </div>
 </div>

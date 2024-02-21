@@ -1,25 +1,26 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { AgGridAngular } from 'ag-grid-angular';
-
-
-
-import { ColDef, GridApi, GridReadyEvent} from 'ag-grid-community';
+import { ColDef, GridApi, GridReadyEvent, RowClickedEvent} from 'ag-grid-community';
+import { CommonModule } from '@angular/common';
+import { iTransaction } from '../data/transactionInterface';
 
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [AgGridAngular, FormsModule],
+  imports: [AgGridAngular, CommonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit{
 
   private gridApi!: GridApi<any>
-  selectedFormat:string = 'csv'
+  public rowSelection: 'single' | 'multiple' = 'multiple'
+
   accountList:any[] = []
+  selectedAccountID: string | null = null
+  selectedAccountDetails:iTransaction[] | null = null
 
   constructor(private http: HttpClient){
 
@@ -35,6 +36,12 @@ export class AppComponent implements OnInit{
     })
   }
 
+  loadAdditionalDetails(accountId: string){
+    this.http.get<iTransaction[]>('https://raw.githubusercontent.com/a-tremblay/grid-poc/main/data/transactions.json').subscribe((res: iTransaction[]) => {
+      this.selectedAccountDetails = res.filter(item => item.accountId === accountId);
+    });
+  }
+
   onBtExport(){
       this.gridApi.exportDataAsCsv()
     } 
@@ -43,7 +50,15 @@ export class AppComponent implements OnInit{
     this.gridApi=event.api
   }
 
-  public rowSelection: 'single' | 'multiple' = 'multiple'
+  onRowClicked(event: RowClickedEvent<any>) {
+    const rowData = event.data
+    if (rowData && rowData._id) {
+      this.selectedAccountID = rowData._id
+      if (this.selectedAccountID !== null){
+        this.loadAdditionalDetails(this.selectedAccountID)
+      }
+    }
+  }
 
   colDefs: ColDef[] = [
     
@@ -54,6 +69,18 @@ export class AppComponent implements OnInit{
     }},
     { field: "timezone", headerName:'Timezone'},
     { field: "currency", headerName:'Currency'}
+  ]
+
+  additionalColDefs: ColDef[] = [
+    { field: "direction", headerName: 'Direction' },
+    { field: "description", headerName: 'Description' },
+    { field: "accountId", headerName: 'Account ID' },
+    { field: "_revalTransaction", headerName: 'Reval Transaction' },
+    { field: "_quantity", headerName: 'Quantity' },
+    { field: "_valuation", headerName: 'Valuation' },
+    { field: "_transactionDate", headerName: 'Transaction Date' },
+    { field: "category", headerName: 'Category' },
+    { field: "classifications", headerName: 'Classifications' }
   ]
 
   defaultColDef = {
