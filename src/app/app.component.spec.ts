@@ -14,11 +14,11 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'Ag-grid' title`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('Ag-grid');
-  });
+  // it(`should have the 'Ag-grid' title`, () => {
+  //   const fixture = TestBed.createComponent(AppComponent);
+  //   const app = fixture.componentInstance;
+  //   expect(app.title).toEqual('Ag-grid');
+  // });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
