@@ -1,8 +1,21 @@
-<ag-grid-angular style="height: 500px;width: 100%;"
-                 class="ag-theme-quartz"
-                 [rowData]="accountList"
-                 [columnDefs]="colDefs"
-                 [defaultColDef]="defaultColDef"
-                 >
-  
-</ag-grid-angular>
+<div>
+  <button (click)='onBtExport()'
+          style="margin-bottom: 5px; font-weight: bold;">
+          Export to CSV
+  </button>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <ag-grid-angular style="height: 500px;width: 100%;"
+    class="ag-theme-quartz"
+    [rowData]="accountList"
+    [columnDefs]="colDefs"
+    [defaultColDef]="defaultColDef"
+    (gridReady)="onGridReady($event)"
+    [rowSelection]="rowSelection"
+    [pagination]="true"
+    [paginationPageSizeSelector]='[5, 10, 20, 50, 100]'>
+    </ag-grid-angular>
+  </div>
+</div>

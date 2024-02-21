@@ -1,24 +1,30 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { AgGridAngular } from 'ag-grid-angular';
 
 
-import { ColDef, GridOptions } from 'ag-grid-community';
+
+import { ColDef, GridApi, GridReadyEvent} from 'ag-grid-community';
 
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [AgGridAngular],
+  imports: [AgGridAngular, FormsModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit{
-  
+
+  private gridApi!: GridApi<any>
+  selectedFormat:string = 'csv'
   accountList:any[] = []
+
   constructor(private http: HttpClient){
 
   }
+
   ngOnInit(): void {
     this.getAccount()
   }
@@ -29,15 +35,19 @@ export class AppComponent implements OnInit{
     })
   }
 
-  // gridOptions: GridOptions = {
-  //   defaultColDef: {
-  //     filter: 'agTextColumnFilter'
-  //   }
-  // }
+  onBtExport(){
+      this.gridApi.exportDataAsCsv()
+    } 
+    
+  onGridReady(event: GridReadyEvent<any>){
+    this.gridApi=event.api
+  }
+
+  public rowSelection: 'single' | 'multiple' = 'multiple'
 
   colDefs: ColDef[] = [
     
-    { field: "_id", headerName:'ID'},
+    { field: "_id", headerName:'ID', headerCheckboxSelection:true, checkboxSelection:true},
     { field: "name", headerName:'Name',
       cellRenderer:(item:any) =>{
       return item.value + '#' + item.data._id.slice(-4).toUpperCase()
