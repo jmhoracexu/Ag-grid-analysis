@@ -62,7 +62,7 @@ export class AppComponent implements OnInit{
 
   colDefs: ColDef[] = [
     
-    { field: "_id", headerName:'ID', headerCheckboxSelection:true, checkboxSelection:true},
+    { field: "_id", headerName:'ID', headerCheckboxSelection:true},
     { field: "name", headerName:'Name',
       cellRenderer:(item:any) =>{
       return item.value + '#' + item.data._id.slice(-4).toUpperCase()
@@ -72,20 +72,79 @@ export class AppComponent implements OnInit{
   ]
 
   additionalColDefs: ColDef[] = [
+    { field: "accountId", headerName: 'Account ID', checkboxSelection:true},
     { field: "direction", headerName: 'Direction' },
     { field: "description", headerName: 'Description' },
-    { field: "accountId", headerName: 'Account ID' },
-    { field: "_revalTransaction", headerName: 'Reval Transaction' },
-    { field: "_quantity", headerName: 'Quantity' },
-    { field: "_valuation", headerName: 'Valuation' },
-    { field: "_transactionDate", headerName: 'Transaction Date' },
-    { field: "category", headerName: 'Category' },
-    { field: "classifications", headerName: 'Classifications' }
+    // reval transaction checkbox -> string 
+    { field: "_revalTransaction", headerName: 'Reval Transaction',
+      cellRenderer: this.revalTransactionCellRenderer.bind(this)},
+    { field: "_quantity", headerName: 'Quantity',
+      cellRenderer: this.quantityCellRenderer.bind(this)},
+    { field: "_valuation", headerName: 'Valuation',
+      cellRenderer: this.valuationCellRenderer.bind(this)},
+    { field: "_transactionDate", headerName: 'Transaction Date',
+      cellRenderer: this.transactionDateCellRenderer.bind(this)},
+    { field: "category", headerName: 'Category',
+      valueFormatter: (item:any) => {
+       return item.value.replace('Category ', '')}
+    },
+    { field: "classifications", headerName: 'Classifications', 
+      valueFormatter: (item:any) => {
+       return item.value.map((param:string) => param.replace('Classification ', '')).join(', ')}
+    }
   ]
 
   defaultColDef = {
     flex:1,
     minWidth:100,
     filter:'agTextColumnFilter'
+  }
+
+  revalTransactionCellRenderer(params: any) {
+    const revalTransaction = params.value
+    if (revalTransaction === true) {
+      return 'true'
+    } else if (revalTransaction === false) {
+      return 'false'
+    } 
+    else {
+      return ''}
+  }
+
+  quantityCellRenderer(params: any) {
+    const quantity = params.value;
+    if (quantity && quantity._actualQuantity && quantity._actualQuantity._amount && quantity._actualQuantity._symbol && quantity._actualQuantity._precision) {
+      const amount = quantity._actualQuantity._amount
+      const symbol = quantity._actualQuantity._symbol
+      const precision = quantity._actualQuantity._precision
+      return `${amount.toFixed(precision)} ${symbol}`
+    } 
+    else {
+      return 0}
+  }
+
+  valuationCellRenderer(params: any){
+    const valuation = params.value;
+    if (valuation && valuation._value && valuation._value._amount && valuation._value._symbol && valuation._value._precision) {
+      const amount = valuation._value._amount
+      const symbol = valuation._value._symbol
+      const precision = valuation._value._precision
+      return `${amount.toFixed(precision)} ${symbol}`
+    }
+    else {
+      return 0}
+  }
+
+  transactionDateCellRenderer(params: any) {
+    const transactionDate = params.value;
+    if (transactionDate && typeof transactionDate === 'string') {
+      // Handle ISO format date
+      return new Date(transactionDate).toLocaleDateString()
+    } else if (transactionDate && typeof transactionDate === 'object' && transactionDate.date) {
+      // Handle object format date
+      return new Date(transactionDate.date).toLocaleDateString()
+    } else {
+      return ''
+    }
   }
 }
