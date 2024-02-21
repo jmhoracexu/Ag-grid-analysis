@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef, GridApi, GridReadyEvent, RowClickedEvent} from 'ag-grid-community';
+import { ColDef, GridApi, GridReadyEvent, INumberFilterParams, RowClickedEvent} from 'ag-grid-community';
 import { CommonModule } from '@angular/common';
 import { iTransaction } from '../data/transactionInterface';
 
@@ -72,22 +72,30 @@ export class AppComponent implements OnInit{
   ]
 
   additionalColDefs: ColDef[] = [
+    // ID
     { field: "accountId", headerName: 'Account ID', checkboxSelection:true},
+    // direction
     { field: "direction", headerName: 'Direction' },
+    // description
     { field: "description", headerName: 'Description' },
-    // reval transaction checkbox -> string 
+    // reval transaction | checkbox -> string 
     { field: "_revalTransaction", headerName: 'Reval Transaction',
       cellRenderer: this.revalTransactionCellRenderer.bind(this)},
-    { field: "_quantity", headerName: 'Quantity',
+    // quantity | trying to get filter to work
+    { field: "_quantity", headerName: 'Quantity', filter: 'agNumberColumnFilter', filterParams:numberFilterParams,
       cellRenderer: this.quantityCellRenderer.bind(this)},
-    { field: "_valuation", headerName: 'Valuation',
+    // valuation | todo
+    { field: "_valuation", headerName: 'Valuation', filter: 'agNumberColumnFilter', 
       cellRenderer: this.valuationCellRenderer.bind(this)},
-    { field: "_transactionDate", headerName: 'Transaction Date',
+    // transaction date
+    { field: "_transactionDate", headerName: 'Transaction Date', filter: 'agDateColumnFilter',
       cellRenderer: this.transactionDateCellRenderer.bind(this)},
+    // category
     { field: "category", headerName: 'Category',
       valueFormatter: (item:any) => {
        return item.value.replace('Category ', '')}
     },
+    // classifications
     { field: "classifications", headerName: 'Classifications', 
       valueFormatter: (item:any) => {
        return item.value.map((param:string) => param.replace('Classification ', '')).join(', ')}
@@ -148,3 +156,17 @@ export class AppComponent implements OnInit{
     }
   }
 }
+
+var numberFilterParams: INumberFilterParams = {
+  // allows only digits and decimal point
+  allowedCharPattern: '[\\d.]',
+  numberParser: (text: string | null) => {
+    return text == null
+      ? null
+      // matche digits and decimal points only
+      : parseFloat(text.replace(/[^\d.]/g, ''))
+  },
+  numberFormatter: (value: number | null) => {
+    return value == null ? null : value.toString()
+  },
+};
